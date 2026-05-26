@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>EZ-Schedule - 2025 Calendar</title>
+    <style>
+        body {
+            display: flex;
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f1f3f5;
+        }
+        .sidebar {
+            width: 300px;
+            background: #ffffff;
+            border-right: 1px solid #dee2e6;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        .sidebar h2 {
+            color: #343a40;
+            margin-top: 0;
+        }
+        .calendar-container {
+            flex: 1;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+            color: #212529;
+        }
+        .year-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            padding: 20px;
+        }
+        .month {
+            background: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            padding: 15px;
+        }
+        .month h2 {
+            color: #495057;
+            margin-top: 0;
+            text-align: center;
+        }
+        .weekdays, .days {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+        }
+        .weekdays div {
+            font-weight: bold;
+            color: #868e96;
+            text-align: center;
+        }
+        .day button {
+            width: 100%;
+            padding: 8px 0;
+            border: none;
+            background: #74c0fc;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .day button:hover {
+            background: #4dabf7;
+        }
+        .day.empty {
+            background: transparent;
+        }
+        .event-form {
+            display: none;
+            margin-top: 20px;
+        }
+        .event-form input, .event-form textarea {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            border: 1px solid #ced4da;
+        }
+        .event-form button {
+            padding: 8px 16px;
+            border: none;
+            background: #51cf66;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .event-form button:hover {
+            background: #40c057;
+        }
+        .event {
+            background: #f8f9fa;
+            border-left: 4px solid #339af0;
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <h2>Reminders</h2>
+        <div id="reminderList"></div>
+    <script>
+        //function saveEvents() {
+        //    const events = Array.from(document.querySelectorAll('.event')).map(event => ({
+        //        date: event.querySelector('strong').innerText,
+        //        title: event.querySelector('.title').innerText,
+        //        desc: event.querySelector('.desc').innerText
+        //   }));
+            events.forEach(event => {
+                fetch('/api/events', {
+                method: 'POST',
+                headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(event)
+    });
+});
+        function loadEvents() {
+            fetch('/api/events')
+            .then(res => res.json())
+            .then(data => {
+                const list = document.getElementById('reminderList');
+                list.innerHTML = '';
+                data.forEach(({ id, date, title, description }) => {
+                const div = document.createElement('div');
+                    div.className = 'event';
+                    div.innerHTML = `<strong>${date}</strong><br><span class='title'>${title}</span><br><small class='desc'>${description}</small><br>
+                <button onclick="editEvent(${id}, this)">Edit</button>
+                <button onclick="deleteEvent(${id}, this)">Delete</button>`;
+            list.appendChild(div);
+        });
+    });
+        }
+
+        function deleteEvent(id, button) {
+    fetch(`/api/events/${id}`, {
+        method: 'DELETE'
+    })
+    .then(res => res.json())
+    .then(response => {
+        if (response.status === 'success') {
+            button.parentElement.remove();
+        } else {
+            alert('Failed to delete event.');
+        }
+    });
+}
+
+function editEvent(id, button) {
+    const eventDiv = button.parentElement;
+    const titleSpan = eventDiv.querySelector('.title');
+    const descSpan = eventDiv.querySelector('.desc');
+
+    const newTitle = prompt("Edit title:", titleSpan.innerText);
+    const newDesc = prompt("Edit description:", descSpan.innerText);
+
+    if (newTitle !== null && newDesc !== null) {
+        fetch(`/api/events/${id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                title: newTitle,
+                description: newDesc,
+                date: eventDiv.querySelector('strong').innerText
+            })
+        })
+        .then(res => res.json())
+        .then(response => {
+            if (response.status === 'edited') {
+                titleSpan.innerText = newTitle;
+                descSpan.innerText = newDesc;
+            } else {
+                alert('Update failed');
+            }
+        });
+    }
+}
+
+        window.addEventListener('load', loadEvents);
+    </script>
+    </div>
+    <div class="calendar-container">
+        <h1>2025 Calendar</h1>
+        <div class="year-container" id="calendarGrid"></div>
+        <div class="event-form" id="eventForm">
+            <h3>Add Event for <span id="selectedDay"></span></h3>
+            <input type="text" id="eventTitle" placeholder="Event Title">
+            <textarea id="eventDescription" placeholder="Event Description"></textarea>
+            <button onclick="addEvent()">Add Reminder</button>
+        </div>
+    </div>
+    <script>
+    
+    window.onload = function() {
+    openEventForm(mysql.connector);
+    document.getElementById('eventTitle').value = (inputs);
+    document.getElementById('eventDescription').value = (inputs);
+    addEvent();
+    console.log('Event added');
+};
+      
+      </script>
+
+    <script>
+        const monthData = [
+            { name: 'January', days: 31, start: 3 },
+            { name: 'February', days: 28, start: 6 },
+            { name: 'March', days: 31, start: 6 },
+            { name: 'April', days: 30, start: 2 },
+            { name: 'May', days: 31, start: 4 },
+            { name: 'June', days: 30, start: 0 },
+            { name: 'July', days: 31, start: 2 },
+            { name: 'August', days: 31, start: 5 },
+            { name: 'September', days: 30, start: 1 },
+            { name: 'October', days: 31, start: 3 },
+            { name: 'November', days: 30, start: 6 },
+            { name: 'December', days: 31, start: 1 }
+        ];
+
+        let selectedDate = '';
+
+        function openEventForm(date) {
+            selectedDate = date;
+            document.getElementById('selectedDay').innerText = date;
+            document.getElementById('eventForm').style.display = 'block';
+        }
+
+        function addEvent() {
+            const title = document.getElementById('eventTitle').value.trim();
+            const desc = document.getElementById('eventDescription').value.trim();
+            const reminderList = document.getElementById('reminderList');
+
+            if (!title) return;
+
+            const eventDiv = document.createElement('div');
+            eventDiv.className = 'event';
+            fetch('/api/events', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    date: selectedDate,
+                    title: title,
+                    description: desc
+                })
+            })
+            .then(res => res.json())
+            .then(response => {
+                if (response.status === "success") {
+                    loadEvents(); // Reload from DB after saving
+                }
+            });
+
+            document.getElementById('eventTitle').value = '';
+            document.getElementById('eventDescription').value = '';
+            document.getElementById('eventForm').style.display = 'none';
+        }
+
+        function generateCalendar() {
+            const calendarGrid = document.getElementById('calendarGrid');
+
+            monthData.forEach((month, idx) => {
+                const monthDiv = document.createElement('div');
+                monthDiv.className = 'month';
+                monthDiv.innerHTML = `<h2>${month.name}</h2>
+                    <div class="weekdays">
+                        <div>S</div><div>M</div><div>T</div><div>W</div><div>T</div><div>F</div><div>S</div>
+                    </div>`;
+
+                const daysDiv = document.createElement('div');
+                daysDiv.className = 'days';
+
+                for (let i = 0; i < month.start; i++) {
+                    const emptyDiv = document.createElement('div');
+                    emptyDiv.className = 'day empty';
+                    daysDiv.appendChild(emptyDiv);
+                }
+
+                for (let d = 1; d <= month.days; d++) {
+                    const dayDiv = document.createElement('div');
+                    dayDiv.className = 'day';
+                    dayDiv.innerHTML = `<button onclick="openEventForm('${month.name} ${d}')">${d}</button>`;
+                    daysDiv.appendChild(dayDiv);
+                }
+
+                monthDiv.appendChild(daysDiv);
+                calendarGrid.appendChild(monthDiv);
+            });
+        }
+
+        generateCalendar();
+    </script>
+</body>
+</html>
