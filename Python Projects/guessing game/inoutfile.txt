@@ -1,0 +1,12 @@
+animal
+1 is it a dog
+1 can it fit in your hand
+1 does it have stripes
+1 does it have a mane
+1 is your animal a silent hunter
+0 cat
+0 fox
+0 lion
+0 zebra
+0 hamptor
+0 dog
